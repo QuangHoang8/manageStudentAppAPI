@@ -32,14 +32,12 @@ function showConfirm(onOk, onCancel) {
 }
 
 export default function NewStudent() {
-  // const dispatch = useDispatch();
   const history = useHistory();
 
   const handleSaveAdded = async (values) => {
     await addStudent(values);
     history.push("/");
     return;
-    // dispatch(saveStudent(values));
   };
 
   const handleCancelAdding = (dirty) => {

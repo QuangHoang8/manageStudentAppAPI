@@ -3,7 +3,7 @@ import axios from "axios";
 const url = "http://localhost:5000/Student";
 const getStudentEndPoint = `${url}/GetStudents`;
 const addStudentEndPoint = `${url}/AddStudent`;
-const modifyStudentEndPoint = ``;
+const modifyStudentEndPoint = `${url}/ModifyStudent`;
 
 export const getStudent = async (search, page, pageSize) =>
   (
@@ -36,7 +36,22 @@ export const addStudent = async (newStudent) => {
   });
 };
 
-export const modifyStudent = async (modifiedStudent) =>
-  await axios.get(modifyStudentEndPoint, {
-    modifiedStudent: modifiedStudent,
+export const modifyStudent = async (modifiedStudent) => {
+  let fd = new FormData();
+
+  modifiedStudent = {
+    ...modifiedStudent,
+    gender: Number.parseInt(modifiedStudent.gender),
+  };
+  for (const key in modifiedStudent) {
+    if (Object.hasOwnProperty.call(modifiedStudent, key)) {
+      const value = modifiedStudent[key];
+      fd.append(key, value);
+    }
+  }
+  return await axios.post(modifyStudentEndPoint, fd, {
+    headers: {
+      "Content-Type": `multipart/form-data boundary=${fd._boundary}`,
+    },
   });
+};

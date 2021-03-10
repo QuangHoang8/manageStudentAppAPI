@@ -3,10 +3,10 @@ import { Modal, Button, Space } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import style from "./NewStudent.module.css";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import * as Yup from "yup";
-import { editStudent } from "../action/actionCreator";
+import { modifyStudent } from "../studentService";
 import { useHistory } from "react-router-dom";
 import { ErrorMessage, Field, Formik } from "formik";
 import { Utils } from "../utils/Utils";
@@ -31,18 +31,17 @@ function showConfirm(onOk, onCancel) {
   });
 }
 
-export default function ModifyStudent(props) {
+export default function ModifyStudent() {
   const studentId = useParams().id;
 
   const student = useSelector((state) =>
     state.students.studentList.find((s) => s.id === studentId)
   );
 
-  const dispatch = useDispatch();
   const history = useHistory();
 
-  const handleSaveStudent = (values) => {
-    dispatch(editStudent(values));
+  const handleSaveStudent = async (values) => {
+    await modifyStudent(values);
     history.push("/");
   };
 
