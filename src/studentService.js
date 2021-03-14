@@ -1,9 +1,11 @@
 import axios from "axios";
+import { Utils } from "./utils/Utils";
 // const user = "vu";
 const url = "http://localhost:5000/Student";
 const getStudentEndPoint = `${url}/GetStudents`;
 const addStudentEndPoint = `${url}/AddStudent`;
 const modifyStudentEndPoint = `${url}/ModifyStudent`;
+const getStudentByIdEndPoint = `${url}/GetStudent`;
 
 export const getStudent = async (search, page, pageSize) =>
   (
@@ -42,7 +44,11 @@ export const modifyStudent = async (modifiedStudent) => {
   modifiedStudent = {
     ...modifiedStudent,
     gender: Number.parseInt(modifiedStudent.gender),
+    admissionDate: new Date(modifiedStudent.admissionDate).toLocaleDateString(
+      "en-CA"
+    ),
   };
+  console.log(new Date(modifiedStudent.admissionDate));
   for (const key in modifiedStudent) {
     if (Object.hasOwnProperty.call(modifiedStudent, key)) {
       const value = modifiedStudent[key];
@@ -54,4 +60,22 @@ export const modifyStudent = async (modifiedStudent) => {
       "Content-Type": `multipart/form-data boundary=${fd._boundary}`,
     },
   });
+};
+// await axios.post(modifyStudentEndPoint, {
+//   modifiedStudent: modifiedStudent,
+// });
+
+export const getStudentById = async (id) => {
+  const result = await axios.get(getStudentByIdEndPoint, {
+    params: {
+      id,
+    },
+  });
+  const data = result.data.data;
+  return {
+    ...data,
+    img: Utils.getAvatarUrlFromFileName(data.img),
+    admissionDate: new Date(data.admissionDate),
+    birthday: new Date(data.birthday),
+  };
 };

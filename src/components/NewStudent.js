@@ -1,15 +1,16 @@
 import React from "react";
-import { Modal, Button, Space } from "antd";
+import { Modal, Button, Space, message } from "antd";
 import ArrowBackIosIcon from "@material-ui/icons/ArrowBackIos";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import style from "./NewStudent.module.css";
 import { Formik, Field, ErrorMessage } from "formik";
-// import { useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 // import { saveStudent } from "../action/actionCreator";
 import { useHistory } from "react-router-dom";
-import { Utils } from "../utils/Utils";
+// import { Utils } from "../utils/Utils";
 import * as Yup from "yup";
 import { addStudent } from "../studentService";
+import { refreshStudentList } from "../action/actionCreator";
 
 const { confirm } = Modal;
 
@@ -33,11 +34,18 @@ function showConfirm(onOk, onCancel) {
 
 export default function NewStudent() {
   const history = useHistory();
-
-  const handleSaveAdded = async (values) => {
-    await addStudent(values);
-    history.push("/");
-    return;
+  const dispatch = useDispatch();
+  const handleSaveAdded = async (values, helper) => {
+    try {
+      await addStudent(values);
+      message.success("Lưu thành công");
+      dispatch(refreshStudentList());
+      history.push("/");
+    } catch {
+      message.error("có lỗi xảy ra, vui lòng thử lại!");
+    } finally {
+      helper.setSubmitting(false);
+    }
   };
 
   const handleCancelAdding = (dirty) => {
@@ -81,7 +89,14 @@ export default function NewStudent() {
         })}
         onSubmit={handleSaveAdded}
       >
-        {({ values, setFieldValue, handleSubmit, isValid, dirty }) => {
+        {({
+          values,
+          setFieldValue,
+          handleSubmit,
+          isValid,
+          dirty,
+          isSubmitting,
+        }) => {
           return (
             <React.Fragment>
               <div
@@ -101,12 +116,13 @@ export default function NewStudent() {
                         className={style.file}
                         onChange={(e) => {
                           const urlImg = URL.createObjectURL(e.target.files[0]);
+                          console.log(urlImg)
                           setFieldValue("img", urlImg, true);
                           setFieldValue("imageFile", e.target.files[0]);
                         }}
                       />
                       <img
-                        src={Utils.getAvatarUrlFromFileName(values.img)}
+                        src={values.img}
                         alt={values.name}
                       />
                     </label>
@@ -171,11 +187,17 @@ export default function NewStudent() {
                   <Button
                     disabled={!isValid}
                     type="primary"
+                    loading={isSubmitting}
                     onClick={handleSubmit}
                   >
                     Thêm
                   </Button>
-                  <Button onClick={() => handleCancelAdding(dirty)}>Huỷ</Button>
+                  <Button
+                    disabled={isSubmitting}
+                    onClick={() => handleCancelAdding(dirty)}
+                  >
+                    Huỷ
+                  </Button>
                 </Space>
               </div>
             </React.Fragment>

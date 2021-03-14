@@ -1,5 +1,8 @@
 export const Utils = {
   getAvatarUrlFromFileName: (filename) => {
-    return `/studentImg/${filename}`;
+    return `http://localhost:5000/StaticFiles/${filename}`;
+  },
+  getAvatarPathFromFileName: (filename) => {
+    return `./studentImg/${filename}`;
   },
 };
